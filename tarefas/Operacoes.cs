@@ -32,6 +32,36 @@ public class Operacoes
 
     public IList<Tarefa> Listar()
     {
+
+        using (var conexao = new MySqlConnection(connectionString))
+        {
+            var tarefas = new List<Tarefas>();
+            var sql = "SELECT id, nome, descricao, dataCriacao, dataExecucao, status FROM 'tarefa'";
+            conexao.Open();
+
+            using (var cmd = new MySqlCommand(sql, conexao))
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    var tarefa = new Tarefa
+                    {
+                        id = reader.GetInt32("id"),
+                        Nome = reader.GetString("nome");
+                        Descricao = reader.GetString("descricao");
+                        DataCriacao = reader.GetDateTime("dataCriacao"),
+                        DataExecucao = reader.IsDBNull(reader.GetOrdinal("dataExecucao"))
+                                        ? (DateTime?)null
+                                        :reader.GetDateTime("dataExecucao"),
+                        Status = reader.GetInt32("status")
+                    };
+
+                    tarefas.Add(tarefa);
+
+                }
+                
+            }
+        }
         return Array.Empty<Tarefa>();
     }
 
